@@ -26,12 +26,12 @@
           {{ store.selectedElement }}
         </template>
       </h2>
-      <div class="character-grid" :class="{ 'wrap-grid': filteredCharacters.length > 4 }">
-        <CharacterCard
-          v-for="character in filteredCharacters"
-          :key="character.id"
-          :character="character"
-        />
+      <div class="character-grid">
+        <template v-for="character in filteredCharacters" :key="character.id">
+          <CharacterCard
+            :character="character"
+          />
+        </template>
       </div>
     </div>
 
@@ -42,7 +42,7 @@
            class="faction-section"
            v-show="characters.length > 0">
         <h2 class="faction-title">{{ faction }}</h2>
-        <div class="character-grid" :class="{ 'wrap-grid': characters.length > 4 }">
+        <div class="character-grid">
           <CharacterCard
             v-for="character in characters"
             :key="character.id"
@@ -63,7 +63,74 @@ import { charactersData } from '@/data/characters';
 import type { Character } from '@/types/character';
 
 const store = useCharacterStore();
-const filteredCharacters = computed(() => store.filteredCharacters);
+
+// 필터링된 캐릭터 (역할군/속성 필터용)
+const filteredCharacters = computed(() => {
+  let result = store.filteredCharacters;
+  
+  // 검색어로 필터링
+  if (store.searchQuery.trim()) {
+    const query = store.searchQuery.toLowerCase().trim();
+    result = result.filter(char => 
+      char.name.toLowerCase().includes(query)
+    );
+  }
+  
+  // 역할군으로 필터링
+  if (store.selectedType) {
+    result = result.filter(char => char.type === store.selectedType);
+  }
+  
+  // 속성으로 필터링
+  if (store.selectedElement) {
+    result = result.filter(char => char.element === store.selectedElement);
+  }
+  
+  // 등급으로 정렬 (S > A)
+  const sRank = result.filter(char => char.grade === 'S').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+  const aRank = result.filter(char => char.grade === 'A').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+  return [...sRank, ...aRank];
+});
+
+// 진영별로 캐릭터 그룹화 (진영별 보기용)
+const groupedCharacters = computed(() => {
+  const groups: { [key: string]: Character[] } = {};
+  let characters = store.filteredCharacters;
+  
+  // 검색어로 필터링
+  if (store.searchQuery.trim()) {
+    const query = store.searchQuery.toLowerCase().trim();
+    characters = characters.filter(char => 
+      char.name.toLowerCase().includes(query)
+    );
+  }
+  
+  // 먼저 모든 진영을 초기화
+  const allFactions = [...new Set(charactersData.map(char => char.faction))];
+  allFactions.forEach(faction => {
+    groups[faction] = [];
+  });
+  
+  // 캐릭터들을 각 진영에 할당
+  characters.forEach(character => {
+    groups[character.faction].push(character);
+  });
+
+  // 각 진영 내에서 등급순으로 정렬
+  Object.keys(groups).forEach(faction => {
+    const sRank = groups[faction].filter(char => char.grade === 'S').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    const aRank = groups[faction].filter(char => char.grade === 'A').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    groups[faction] = [...sRank, ...aRank];
+  });
+
+  // 진영 이름으로 정렬
+  return Object.keys(groups)
+    .sort()
+    .reduce((sorted: { [key: string]: Character[] }, faction) => {
+      sorted[faction] = groups[faction];
+      return sorted;
+    }, {});
+});
 
 // 속성 한글명을 영문 파일명으로 매핑
 const getElementImageName = (element: string): { name: string; ext: string } => {
@@ -91,30 +158,6 @@ const getProfessionImageName = (profession: string): string => {
   };
   return professionMap[profession] || profession;
 };
-
-// 진영별로 캐릭터 그룹화
-const groupedCharacters = computed(() => {
-  const groups: { [key: string]: Character[] } = {};
-  
-  // 먼저 모든 진영을 초기화
-  const allFactions = [...new Set(charactersData.map(char => char.faction))];
-  allFactions.forEach(faction => {
-    groups[faction] = [];
-  });
-  
-  // 필터링된 캐릭터들을 각 진영에 할당
-  filteredCharacters.value.forEach(character => {
-    groups[character.faction].push(character);
-  });
-
-  // 진영 이름으로 정렬
-  return Object.keys(groups)
-    .sort()
-    .reduce((sorted: { [key: string]: Character[] }, faction) => {
-      sorted[faction] = groups[faction];
-      return sorted;
-    }, {});
-});
 
 onMounted(() => {
   store.initializeCharacters(charactersData);
@@ -152,12 +195,11 @@ onMounted(() => {
 .character-grid {
   display: grid;
   gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  /* 4개 이하일 때는 자동으로 채우되, 최대 4개까지만 한 줄에 표시 */
-  grid-template-columns: repeat(auto-fill, minmax(calc(25% - 1.125rem), 1fr));
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: start;
 }
 
-/* 4개 초과 시 줄바꿈 */
+/* 4개 초과 시에도 4열 유지 */
 .character-grid.wrap-grid {
   grid-template-columns: repeat(4, 1fr);
 }
@@ -176,12 +218,14 @@ onMounted(() => {
 }
 
 @media (max-width: 1200px) {
+  .character-grid,
   .character-grid.wrap-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 900px) {
+  .character-grid,
   .character-grid.wrap-grid {
     grid-template-columns: repeat(2, 1fr);
   }

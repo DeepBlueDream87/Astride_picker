@@ -15,27 +15,9 @@ export const useCharacterStore = defineStore('character', {
     filteredCharacters: (state) => {
       let result = state.characters;
       
-      // 검색어로 필터링
-      if (state.searchQuery.trim()) {
-        const query = state.searchQuery.toLowerCase().trim();
-        result = result.filter(char => 
-          char.name.toLowerCase().includes(query)
-        );
-      }
-      
-      // 진영으로 필터링
+      // 진영으로만 필터링
       if (state.selectedFaction) {
         result = result.filter(char => char.faction === state.selectedFaction);
-      }
-      
-      // 역할군으로 필터링
-      if (state.selectedType) {
-        result = result.filter(char => char.type === state.selectedType);
-      }
-      
-      // 속성으로 필터링
-      if (state.selectedElement) {
-        result = result.filter(char => char.element === state.selectedElement);
       }
       
       return result;
