@@ -1,16 +1,15 @@
 <template>
   <div class="app">
-    <nav class="nav-bar">
-      <router-link to="/" class="nav-logo">Astride Picker</router-link>
-      <div class="nav-links">
-        <router-link to="/characters">캐릭터 목록</router-link>
-        <router-link to="/team-builder">팀 빌더</router-link>
-        <router-link to="/board">게시판</router-link>
-      </div>
-    </nav>
-
-    <main>
-      <router-view />
+    <header class="header">
+      <h1>아스트라이드 캐릭터 도감</h1>
+      <nav class="nav">
+        <RouterLink to="/" class="nav-link">캐릭터 목록</RouterLink>
+        <RouterLink to="/team-builder" class="nav-link">랜덤 팀 빌더</RouterLink>
+      </nav>
+    </header>
+    
+    <main class="main">
+      <RouterView />
     </main>
 
     <footer>
@@ -20,12 +19,13 @@
 </template>
 
 <script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router';
 </script>
 
 <style>
 :root {
-  --primary-color: #3f51b5;
-  --secondary-color: #f50057;
+  --primary-color: #6366f1;
+  --primary-dark-color: #4f46e5;
   --background-color: #f5f5f5;
   --text-color: #333;
 }
@@ -51,45 +51,44 @@ body {
   flex-direction: column;
 }
 
-.nav-bar {
+.header {
   background: white;
   padding: 1rem;
+  margin-bottom: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  text-align: center;
 }
 
-.nav-logo {
-  font-size: 1.5rem;
+.header h1 {
+  font-size: 2rem;
+  color: var(--primary-color);
   font-weight: 600;
-  color: var(--primary-color);
-  text-decoration: none;
+  margin-bottom: 1rem;
 }
 
-.nav-links {
+.nav {
   display: flex;
-  gap: 1.5rem;
+  justify-content: center;
+  gap: 2rem;
 }
 
-.nav-links a {
-  text-decoration: none;
+.nav-link {
   color: var(--text-color);
+  text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
 }
 
-.nav-links a:hover,
-.nav-links a.router-link-active {
+.nav-link:hover,
+.nav-link.router-link-active {
   color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.1);
 }
 
-main {
+.main {
   flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 1rem;
 }
 
 footer {
@@ -100,14 +99,12 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .nav-bar {
-    flex-direction: column;
-    gap: 1rem;
+  .header h1 {
+    font-size: 1.5rem;
   }
-
-  .nav-links {
+  
+  .nav {
     flex-direction: column;
-    align-items: center;
     gap: 0.5rem;
   }
 }
