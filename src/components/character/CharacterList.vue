@@ -2,16 +2,54 @@
   <div class="character-list-container">
     <CharacterFilter />
     
-    <div class="character-grid">
-      <CharacterCard
-        v-for="character in filteredCharacters"
-        :key="character.id"
-        :character="character"
-      />
-    </div>
-    
     <div v-if="filteredCharacters.length === 0" class="no-results">
       <p>검색 결과가 없습니다.</p>
+    </div>
+
+    <!-- 역할군이나 속성 필터가 선택된 경우 -->
+    <div v-else-if="store.selectedType || store.selectedElement" class="single-grid-section">
+      <h2 class="filter-title">
+        <template v-if="store.selectedType">
+          <img 
+            :src="`/images/professions/${getProfessionImageName(store.selectedType)}.webp`" 
+            :alt="store.selectedType"
+            class="profession-icon"
+          >
+          {{ store.selectedType }}
+        </template>
+        <template v-else-if="store.selectedElement">
+          <img 
+            :src="`/images/elements/${getElementImageName(store.selectedElement).name}.${getElementImageName(store.selectedElement).ext}`" 
+            :alt="store.selectedElement"
+            class="element-icon"
+          >
+          {{ store.selectedElement }}
+        </template>
+      </h2>
+      <div class="character-grid" :class="{ 'wrap-grid': filteredCharacters.length > 4 }">
+        <CharacterCard
+          v-for="character in filteredCharacters"
+          :key="character.id"
+          :character="character"
+        />
+      </div>
+    </div>
+
+    <!-- 진영별 그룹핑 (역할군/속성 필터가 없을 때) -->
+    <div v-else class="factions-container">
+      <div v-for="(characters, faction) in groupedCharacters" 
+           :key="faction" 
+           class="faction-section"
+           v-show="characters.length > 0">
+        <h2 class="faction-title">{{ faction }}</h2>
+        <div class="character-grid" :class="{ 'wrap-grid': characters.length > 4 }">
+          <CharacterCard
+            v-for="character in characters"
+            :key="character.id"
+            :character="character"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -22,9 +60,61 @@ import { useCharacterStore } from '@/stores/characterStore';
 import CharacterFilter from './CharacterFilter.vue';
 import CharacterCard from './CharacterCard.vue';
 import { charactersData } from '@/data/characters';
+import type { Character } from '@/types/character';
 
 const store = useCharacterStore();
 const filteredCharacters = computed(() => store.filteredCharacters);
+
+// 속성 한글명을 영문 파일명으로 매핑
+const getElementImageName = (element: string): { name: string; ext: string } => {
+  const elementMap: { [key: string]: { name: string; ext: string } } = {
+    '물리': { name: 'Physical', ext: 'png' },
+    '불': { name: 'Fire', ext: 'png' },
+    '얼음': { name: 'Ice', ext: 'png' },
+    '전기': { name: 'Electric', ext: 'png' },
+    '에테르': { name: 'Ether', ext: 'png' },
+    '서리': { name: 'Frost', ext: 'webp' }
+  };
+  const result = elementMap[element] || { name: element, ext: 'png' };
+  console.log('Element mapping:', element, result); // 디버깅을 위한 로그 추가
+  return result;
+};
+
+// 역할군 한글명을 영문 파일명으로 매핑
+const getProfessionImageName = (profession: string): string => {
+  const professionMap: { [key: string]: string } = {
+    '강공': 'Attack',
+    '이상': 'Abnormal',
+    '방어': 'Defense',
+    '지원': 'Support',
+    '격파': 'Destruction'
+  };
+  return professionMap[profession] || profession;
+};
+
+// 진영별로 캐릭터 그룹화
+const groupedCharacters = computed(() => {
+  const groups: { [key: string]: Character[] } = {};
+  
+  // 먼저 모든 진영을 초기화
+  const allFactions = [...new Set(charactersData.map(char => char.faction))];
+  allFactions.forEach(faction => {
+    groups[faction] = [];
+  });
+  
+  // 필터링된 캐릭터들을 각 진영에 할당
+  filteredCharacters.value.forEach(character => {
+    groups[character.faction].push(character);
+  });
+
+  // 진영 이름으로 정렬
+  return Object.keys(groups)
+    .sort()
+    .reduce((sorted: { [key: string]: Character[] }, faction) => {
+      sorted[faction] = groups[faction];
+      return sorted;
+    }, {});
+});
 
 onMounted(() => {
   store.initializeCharacters(charactersData);
@@ -36,11 +126,40 @@ onMounted(() => {
   padding: 1rem;
 }
 
+.factions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.faction-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.faction-title {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-color);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
 .character-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /* 4개 이하일 때는 자동으로 채우되, 최대 4개까지만 한 줄에 표시 */
+  grid-template-columns: repeat(auto-fill, minmax(calc(25% - 1.125rem), 1fr));
+}
+
+/* 4개 초과 시 줄바꿈 */
+.character-grid.wrap-grid {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .no-results {
@@ -56,9 +175,49 @@ onMounted(() => {
   color: #666;
 }
 
-@media (max-width: 768px) {
-  .character-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+@media (max-width: 1200px) {
+  .character-grid.wrap-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
+}
+
+@media (max-width: 900px) {
+  .character-grid.wrap-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .character-grid,
+  .character-grid.wrap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.single-grid-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-title {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-color);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.element-icon,
+.profession-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
 }
 </style> 

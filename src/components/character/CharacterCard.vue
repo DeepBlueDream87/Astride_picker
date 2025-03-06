@@ -9,11 +9,17 @@
     </div>
     <div class="character-info">
       <h3>{{ character.name }}</h3>
-      <div class="character-details">
-        <span class="faction">{{ character.faction }}</span>
-        <span class="type">{{ character.type }}</span>
-        <span class="element">{{ character.element }}</span>
-        <span class="grade">{{ character.grade }}</span>
+      <div class="character-attributes">
+        <img 
+          :src="`/images/elements/${getElementImageName(character.element).name}.${getElementImageName(character.element).ext}`" 
+          :alt="character.element"
+          class="attribute-icon"
+        >
+        <img 
+          :src="`/images/professions/${getProfessionImageName(character.type)}.webp`" 
+          :alt="character.type"
+          class="attribute-icon"
+        >
       </div>
     </div>
   </div>
@@ -32,7 +38,7 @@ const hasImageError = ref(false);
 
 const characterImagePath = computed(() => {
   if (hasImageError.value) {
-    return '/images/characters/default.png'; // 기본 이미지
+    return '/images/characters/default.png';
   }
   return getCharacterImagePath(props.character.imageFileName);
 });
@@ -40,19 +46,46 @@ const characterImagePath = computed(() => {
 const handleImageError = () => {
   hasImageError.value = true;
 };
+
+// 속성 한글명을 영문 파일명으로 매핑
+const getElementImageName = (element: string): { name: string; ext: string } => {
+  const elementMap: { [key: string]: { name: string; ext: string } } = {
+    '물리': { name: 'Physical', ext: 'png' },
+    '불': { name: 'Fire', ext: 'png' },
+    '얼음': { name: 'Ice', ext: 'png' },
+    '전기': { name: 'Electric', ext: 'png' },
+    '에테르': { name: 'Ether', ext: 'png' },
+    '서리': { name: 'Frost', ext: 'webp' }
+  };
+  return elementMap[element] || { name: element, ext: 'png' };
+};
+
+// 역할군 한글명을 영문 파일명으로 매핑
+const getProfessionImageName = (profession: string): string => {
+  const professionMap: { [key: string]: string } = {
+    '강공': 'Attack',
+    '이상': 'Abnormal',
+    '방어': 'Defense',
+    '지원': 'Support',
+    '격파': 'Destruction'
+  };
+  return professionMap[profession] || profession;
+};
 </script>
 
 <style scoped>
 .character-card {
   border-radius: 8px;
   overflow: hidden;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  background: #1a1a1a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
 
 .character-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .character-card.s {
@@ -64,10 +97,11 @@ const handleImageError = () => {
 }
 
 .character-image {
-  height: 200px;
+  aspect-ratio: 1;
   width: 100%;
   overflow: hidden;
-  background: #f0f0f0;
+  background: #000;
+  position: relative;
 }
 
 .character-image img {
@@ -78,39 +112,33 @@ const handleImageError = () => {
 }
 
 .character-info {
-  padding: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  backdrop-filter: blur(4px);
 }
 
-.character-details {
+.character-info h3 {
+  font-size: 1rem;
+  margin: 0;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+.character-attributes {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
+  align-items: center;
 }
 
-.character-details span {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-
-.faction {
-  background: #e3f2fd;
-  color: #1976d2;
-}
-
-.type {
-  background: #f3e5f5;
-  color: #7b1fa2;
-}
-
-.element {
-  background: #e8f5e9;
-  color: #388e3c;
-}
-
-.grade {
-  background: #fff3e0;
-  color: #f57c00;
+.attribute-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
 }
 </style> 
