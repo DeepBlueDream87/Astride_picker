@@ -1,26 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: () => import('../views/Home.vue'),
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/Login.vue'),
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('../views/NotFound.vue'),
-  },
-]
+import HomeView from '../views/HomeView.vue'
+import CharacterListView from '../views/CharacterListView.vue'
+import TeamBuilderView from '../views/TeamBuilderView.vue'
+import BoardView from '../views/BoardView.vue'
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: HomeView
+    },
+    {
+      path: '/characters',
+      name: 'characters',
+      component: CharacterListView
+    },
+    {
+      path: '/team-builder',
+      name: 'team-builder',
+      component: TeamBuilderView
+    },
+    {
+      path: '/board',
+      name: 'board',
+      component: BoardView
+    }
+  ]
 })
 
 // 네비게이션 가드

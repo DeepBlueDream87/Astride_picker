@@ -1,12 +1,18 @@
 <template>
   <div class="app">
-    <header>
-      <h1>Astride Picker</h1>
-      <p>캐릭터 선택 및 필터링 도구</p>
-    </header>
+    <nav class="nav-bar">
+      <router-link to="/" class="nav-logo">Astride Picker</router-link>
+      <div class="nav-links">
+        <router-link to="/characters">캐릭터 목록</router-link>
+        <router-link to="/team-builder">팀 빌더</router-link>
+        <router-link to="/board">게시판</router-link>
+      </div>
+    </nav>
+
     <main>
-      <CharacterList />
+      <router-view />
     </main>
+
     <footer>
       <p>&copy; 2025 Astride Picker</p>
     </footer>
@@ -14,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import CharacterList from '@/components/character/CharacterList.vue';
 </script>
 
 <style>
@@ -39,36 +44,69 @@ body {
 }
 
 .app {
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-bar {
+  background: white;
   padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-header {
-  text-align: center;
-  padding: 2rem 0;
-}
-
-header h1 {
-  font-size: 2.5rem;
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
   color: var(--primary-color);
-  margin-bottom: 0.5rem;
+  text-decoration: none;
 }
 
-header p {
-  font-size: 1.2rem;
-  color: #666;
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-color);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.router-link-active {
+  color: var(--primary-color);
 }
 
 main {
-  min-height: calc(100vh - 200px);
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1rem;
 }
 
 footer {
   text-align: center;
-  padding: 2rem 0;
-  margin-top: 2rem;
-  color: #666;
-  font-size: 0.9rem;
+  padding: 2rem;
+  background: white;
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .nav-bar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 </style>
