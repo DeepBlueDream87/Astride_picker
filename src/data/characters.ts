@@ -159,7 +159,7 @@ export const charactersData: Character[] = [
     name: '호시미 미야비',
     faction: '대공동 6과',
     type: '이상',
-    element: '서릿불',
+    element: '서리',
     grade: 'S',
     imageFileName: 'hoshimi_miyabi.png'
   },

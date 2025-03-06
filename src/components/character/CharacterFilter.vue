@@ -20,9 +20,9 @@
     </div>
 
     <div class="filter-section">
-      <h3>타입 필터</h3>
+      <h3>역할군 필터</h3>
       <select v-model="selectedType" @change="updateTypeFilter">
-        <option :value="null">전체 타입</option>
+        <option :value="null">전체 역할군</option>
         <option v-for="type in types" :key="type" :value="type">
           {{ type }}
         </option>
@@ -110,6 +110,9 @@ const resetAllFilters = () => {
   border-radius: 4px;
   border: 1px solid #ddd;
   font-size: 1rem;
+  color: #000;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .filter-section {
@@ -123,12 +126,18 @@ select {
   border-radius: 4px;
   border: 1px solid #ddd;
   background-color: white;
+  color: #000;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
 }
 
 h3 {
   margin-bottom: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #000;
+  letter-spacing: -0.01em;
 }
 
 .reset-button {
@@ -139,6 +148,9 @@ h3 {
   border-radius: 4px;
   cursor: pointer;
   align-self: flex-end;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
 }
 
 .reset-button:hover {

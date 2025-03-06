@@ -1,8 +1,8 @@
-// 캐릭터 타입 (강공, 격파, 방어, 지원, 이상)
+// 역할군 (강공, 격파, 방어, 지원, 이상)
 export type CharacterType = '강공' | '격파' | '방어' | '지원' | '이상';
 
-// 속성 타입 (물리, 전기, 에테르, 불, 얼음, 서릿불)
-export type ElementType = '물리' | '전기' | '에테르' | '불' | '얼음' | '서릿불';
+// 속성 타입 (물리, 전기, 에테르, 불, 얼음, 서리)
+export type ElementType = '물리' | '전기' | '에테르' | '불' | '얼음' | '서리';
 
 // 등급 타입
 export type Grade = 'S' | 'A';
@@ -23,7 +23,7 @@ export interface Character {
   id: string;           // 고유 식별자
   name: string;         // 캐릭터 이름
   faction: Faction;     // 소속 진영
-  type: CharacterType;  // 캐릭터 타입
+  type: CharacterType;  // 역할군
   element: ElementType; // 속성
   grade: Grade;         // 등급
   imageFileName: string; // 이미지 파일명

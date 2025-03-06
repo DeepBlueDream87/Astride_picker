@@ -28,7 +28,7 @@ export const useCharacterStore = defineStore('character', {
         result = result.filter(char => char.faction === state.selectedFaction);
       }
       
-      // 타입으로 필터링
+      // 역할군으로 필터링
       if (state.selectedType) {
         result = result.filter(char => char.type === state.selectedType);
       }
@@ -46,14 +46,14 @@ export const useCharacterStore = defineStore('character', {
       return [...new Set(state.characters.map(char => char.faction))].sort();
     },
     
-    // 타입 목록
+    // 역할군 목록
     types: () => {
       return ['강공', '격파', '방어', '지원', '이상'] as CharacterType[];
     },
     
     // 속성 목록
     elements: () => {
-      return ['물리', '전기', '에테르', '불', '얼음', '서릿불'] as ElementType[];
+      return ['물리', '전기', '에테르', '불', '얼음', '서리'] as ElementType[];
     }
   },
 

@@ -37,10 +37,12 @@
 }
 
 body {
-  font-family: 'Noto Sans KR', Arial, sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app {
@@ -60,7 +62,7 @@ body {
 
 .nav-logo {
   font-size: 1.5rem;
-  font-weight: bold;
+  font-weight: 600;
   color: var(--primary-color);
   text-decoration: none;
 }
