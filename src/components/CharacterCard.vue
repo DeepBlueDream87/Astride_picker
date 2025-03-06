@@ -29,23 +29,23 @@
 
 <script setup lang="ts">
 interface CharacterStats {
-  hp: number
-  atk: number
-  def: number
-  spd: number
+  hp: number;
+  atk: number;
+  def: number;
+  spd: number;
 }
 
 interface Character {
-  id: number
-  name: string
-  rarity: string
-  attribute: string
-  image: string
-  stats: CharacterStats
-  position: string
+  id: number;
+  name: string;
+  rarity: string;
+  attribute: string;
+  image: string;
+  stats: CharacterStats;
+  position: string;
 }
 
 defineProps<{
-  character: Character
-}>()
+  character: Character;
+}>();
 </script>
