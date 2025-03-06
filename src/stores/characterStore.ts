@@ -1,83 +1,92 @@
-import { defineStore } from 'pinia'
-import type { Character } from '../api/types/character'
-import { characterService } from '../api/services/characterService'
-
-interface CharacterState {
-  characters: Character[]
-  party: Character[]
-  partyHistory: Character[][]
-  isLoading: boolean
-}
+import { defineStore } from 'pinia';
+import type { Character, Faction, CharacterType, ElementType } from '@/types/character';
 
 export const useCharacterStore = defineStore('character', {
-  state: (): CharacterState => ({
-    characters: [],
-    party: [],
-    partyHistory: [],
-    isLoading: false,
+  state: () => ({
+    characters: [] as Character[],
+    selectedFaction: null as Faction | null,
+    selectedType: null as CharacterType | null,
+    selectedElement: null as ElementType | null,
+    searchQuery: '' as string
   }),
 
   getters: {
-    // 전체 캐릭터 목록
-    getAllCharacters: (state) => state.characters,
-
-    // 현재 파티
-    getCurrentParty: (state) => state.party,
-
-    // 파티 히스토리
-    getPartyHistory: (state) => state.partyHistory,
-
-    // 속성별 캐릭터 수
-    getCharactersByAttribute: (state) => (attribute: string) => {
-      return state.characters.filter((c) => c.attribute === attribute)
+    // 진영별로 필터링된 캐릭터
+    filteredCharacters: (state) => {
+      let result = state.characters;
+      
+      // 검색어로 필터링
+      if (state.searchQuery.trim()) {
+        const query = state.searchQuery.toLowerCase().trim();
+        result = result.filter(char => 
+          char.name.toLowerCase().includes(query)
+        );
+      }
+      
+      // 진영으로 필터링
+      if (state.selectedFaction) {
+        result = result.filter(char => char.faction === state.selectedFaction);
+      }
+      
+      // 타입으로 필터링
+      if (state.selectedType) {
+        result = result.filter(char => char.type === state.selectedType);
+      }
+      
+      // 속성으로 필터링
+      if (state.selectedElement) {
+        result = result.filter(char => char.element === state.selectedElement);
+      }
+      
+      return result;
     },
 
-    // 등급별 캐릭터 수
-    getCharactersByRarity: (state) => (rarity: string) => {
-      return state.characters.filter((c) => c.rarity === rarity)
+    // 진영 목록
+    factions: (state) => {
+      return [...new Set(state.characters.map(char => char.faction))].sort();
     },
+    
+    // 타입 목록
+    types: () => {
+      return ['강공', '격파', '방어', '지원', '이상'] as CharacterType[];
+    },
+    
+    // 속성 목록
+    elements: () => {
+      return ['물리', '전기', '에테르', '불', '얼음', '서릿불'] as ElementType[];
+    }
   },
 
   actions: {
-    // 캐릭터 목록 초기화
-    async initializeCharacters() {
-      this.isLoading = true
-      try {
-        this.characters = await characterService.getCharacters()
-      } catch (error) {
-        console.error('캐릭터 데이터 로딩 실패:', error)
-      } finally {
-        this.isLoading = false
-      }
+    // 캐릭터 데이터 초기화
+    initializeCharacters(characters: Character[]) {
+      this.characters = characters;
     },
-
-    // 파티 생성
-    async generateParty() {
-      this.isLoading = true
-      try {
-        const newParty = await characterService.generateParty()
-        this.party = newParty
-        // 파티 히스토리에 추가
-        this.partyHistory.unshift(newParty)
-        // 최대 10개까지만 저장
-        if (this.partyHistory.length > 10) {
-          this.partyHistory.pop()
-        }
-      } catch (error) {
-        console.error('파티 생성 실패:', error)
-      } finally {
-        this.isLoading = false
-      }
+    
+    // 필터 설정
+    setFactionFilter(faction: Faction | null) {
+      this.selectedFaction = faction;
     },
-
-    // 파티 초기화
-    resetParty() {
-      this.party = []
+    
+    setTypeFilter(type: CharacterType | null) {
+      this.selectedType = type;
     },
-
-    // 파티 히스토리 초기화
-    resetPartyHistory() {
-      this.partyHistory = []
+    
+    setElementFilter(element: ElementType | null) {
+      this.selectedElement = element;
     },
+    
+    // 검색어 설정
+    setSearchQuery(query: string) {
+      this.searchQuery = query;
+    },
+    
+    // 모든 필터 초기화
+    resetFilters() {
+      this.selectedFaction = null;
+      this.selectedType = null;
+      this.selectedElement = null;
+      this.searchQuery = '';
+    }
   },
-})
+}); 

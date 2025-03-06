@@ -1,29 +1,74 @@
 <template>
   <div class="app">
-    <header class="header">
-      <div class="container header-content">
-        <router-link to="/" class="logo">Astride Picker</router-link>
-        <nav class="nav">
-          <router-link to="/" class="nav-link">홈</router-link>
-          <router-link to="/about" class="nav-link">소개</router-link>
-        </nav>
-      </div>
+    <header>
+      <h1>Astride Picker</h1>
+      <p>캐릭터 선택 및 필터링 도구</p>
     </header>
-
-    <main class="main-content">
-      <div class="container">
-        <router-view></router-view>
-      </div>
+    <main>
+      <CharacterList />
     </main>
-
-    <footer class="footer">
-      <div class="container footer-content">
-        <p>&copy; 2024 Astride Picker. All rights reserved.</p>
-      </div>
+    <footer>
+      <p>&copy; 2025 Astride Picker</p>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-// 컴포넌트 로직이 필요한 경우 여기에 추가
+import CharacterList from '@/components/character/CharacterList.vue';
 </script>
+
+<style>
+:root {
+  --primary-color: #3f51b5;
+  --secondary-color: #f50057;
+  --background-color: #f5f5f5;
+  --text-color: #333;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans KR', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+main {
+  min-height: calc(100vh - 200px);
+}
+
+footer {
+  text-align: center;
+  padding: 2rem 0;
+  margin-top: 2rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+</style>
